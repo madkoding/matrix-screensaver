@@ -17,7 +17,7 @@ import winapi
 
 MONITOR_CHECK_SECS = 3.0
 POWER_CHECK_SECS = 5.0
-FPS_AC, FPS_BATTERY = 60, 30
+FPS_BATTERY = 30
 MOUSE_THRESHOLD_PX = 25
 
 
@@ -51,6 +51,30 @@ def make_renderer(pygame, cfg, mons, origin, size, preference):
 
 
 # ------------------------------------------------------------------- session
+class FrameLimiter:
+    """Precise frame pacing: sleep for most of the gap, spin for the last ms.
+
+    pygame's Clock.tick() sleeps in whole milliseconds, which makes a 75 Hz
+    target land anywhere between ~66 and ~83 FPS.
+    """
+
+    def __init__(self):
+        self.next = time.perf_counter()
+
+    def wait(self, fps):
+        step = 1.0 / fps
+        self.next += step
+        now = time.perf_counter()
+        if self.next < now - step:  # fell far behind (e.g. a stall): resync
+            self.next = now
+        while True:
+            left = self.next - time.perf_counter()
+            if left <= 0:
+                break
+            if left > 0.002:
+                time.sleep(left - 0.0015)
+
+
 def run_session(cfg, preview_hwnd=None, seconds=None, shot=None, force=None):
     """Run until the user quits. Returns "quit" or "restart" (monitors changed)."""
     mons = winapi.list_monitors()
@@ -75,14 +99,17 @@ def run_session(cfg, preview_hwnd=None, seconds=None, shot=None, force=None):
         pygame.mouse.set_visible(False)
         winapi.set_topmost(hwnd, vx, vy, vw, vh)
 
-    clock = pygame.time.Clock()
+    # vsync is ignored for a window spanning several monitors (we measured 200+
+    # FPS), so pace frames ourselves at the fastest display's refresh rate.
+    ac_fps = winapi.max_refresh_rate()
+    limiter = FrameLimiter()
     start = last_mon = last_pow = time.perf_counter()
-    fps_cap = FPS_BATTERY if winapi.on_battery() else FPS_AC
+    fps_cap = FPS_BATTERY if winapi.on_battery() else ac_fps
     moved, last_pos, frame, last = 0, None, 0, start
     result = "quit"
     running = True
     while running:
-        clock.tick(fps_cap)
+        limiter.wait(fps_cap)
         now = time.perf_counter()
         t, dt, last = now - start, min(now - last, 0.1), now
 
@@ -106,7 +133,7 @@ def run_session(cfg, preview_hwnd=None, seconds=None, shot=None, force=None):
             running = False
         if now - last_pow > POWER_CHECK_SECS:
             last_pow = now
-            fps_cap = FPS_BATTERY if winapi.on_battery() else FPS_AC
+            fps_cap = FPS_BATTERY if winapi.on_battery() else ac_fps
         if not preview_hwnd and now - last_mon > MONITOR_CHECK_SECS:
             last_mon = now
             if winapi.monitor_signature(winapi.list_monitors()) != sig:
@@ -117,7 +144,8 @@ def run_session(cfg, preview_hwnd=None, seconds=None, shot=None, force=None):
             running = False
 
     if seconds is not None:
-        print(f"renderer: {renderer.name}, avg fps at exit: {clock.get_fps():.1f}")
+        print(f"renderer: {renderer.name}, cap: {fps_cap} Hz, "
+              f"avg fps at exit: {frame / max(t, 1e-6):.1f}")
     renderer.close()
     pygame.display.quit()
     return result

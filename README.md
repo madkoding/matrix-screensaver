@@ -12,7 +12,7 @@ The digital rain from *The Matrix* as a Windows screensaver, written in Python. 
 
 ## Features
 
-- **GPU rendering (OpenGL):** the whole rain is computed in a fragment shader, so it holds 60 FPS across three monitors (7.8 million pixels). A software renderer takes over automatically when OpenGL isn't available (Remote Desktop, some VMs).
+- **GPU rendering (OpenGL):** the whole rain is computed in a fragment shader, so it locks to your displays' refresh rate. It renders 200+ FPS uncapped on an RTX 3060 across three monitors (7.8 million pixels), so there is plenty of headroom. A software renderer takes over automatically when OpenGL isn't available (Remote Desktop, some VMs).
 - **Multi-monitor and DPI-aware:** every display runs its own rain, fitted to its resolution, position and Windows scaling. Plugging or unplugging a display while it runs is picked up automatically.
 - **Film glyphs:** mirrored half-width katakana (MS Gothic) plus digits and symbols in Courier New Bold.
 - **Bright head and trail:** the leading glyph is almost white, the trail fades through phosphor green, and glyphs randomly mutate.
@@ -22,7 +22,7 @@ The digital rain from *The Matrix* as a Windows screensaver, written in Python. 
 - **Typed messages:** now and then *"Wake up, Neo..."* and friends type themselves out over the rain.
 - **Colors:** `film`, `classic`, `amber`, `red`, `blue`, `white`.
 - **Settings dialog** and a live **preview** in the Windows screensaver picker.
-- **Battery friendly:** drops to 30 FPS when unplugged.
+- **Paced to your monitors:** frames are capped at the fastest display's refresh rate (60, 75, 144 Hz...) with a precise limiter, so it doesn't burn GPU for nothing. On battery it drops to 30 FPS.
 - Exits on any key press, click, or mouse movement.
 
 ## Download

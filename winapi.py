@@ -118,3 +118,48 @@ def set_topmost(hwnd, x, y, w, h):
 
 def message_box(text, title):
     user32.MessageBoxW(None, text, title, 0x40)
+
+
+class _DevMode(ctypes.Structure):
+    """DEVMODEW, display-device flavour."""
+    _fields_ = [
+        ("dmDeviceName", wintypes.WCHAR * 32), ("dmSpecVersion", wintypes.WORD),
+        ("dmDriverVersion", wintypes.WORD), ("dmSize", wintypes.WORD),
+        ("dmDriverExtra", wintypes.WORD), ("dmFields", wintypes.DWORD),
+        ("dmPositionX", wintypes.LONG), ("dmPositionY", wintypes.LONG),
+        ("dmDisplayOrientation", wintypes.DWORD), ("dmDisplayFixedOutput", wintypes.DWORD),
+        ("dmColor", wintypes.SHORT), ("dmDuplex", wintypes.SHORT),
+        ("dmYResolution", wintypes.SHORT), ("dmTTOption", wintypes.SHORT),
+        ("dmCollate", wintypes.SHORT), ("dmFormName", wintypes.WCHAR * 32),
+        ("dmLogPixels", wintypes.WORD), ("dmBitsPerPel", wintypes.DWORD),
+        ("dmPelsWidth", wintypes.DWORD), ("dmPelsHeight", wintypes.DWORD),
+        ("dmDisplayFlags", wintypes.DWORD), ("dmDisplayFrequency", wintypes.DWORD),
+        ("dmICMMethod", wintypes.DWORD), ("dmICMIntent", wintypes.DWORD),
+        ("dmMediaType", wintypes.DWORD), ("dmDitherType", wintypes.DWORD),
+        ("dmReserved1", wintypes.DWORD), ("dmReserved2", wintypes.DWORD),
+        ("dmPanningWidth", wintypes.DWORD), ("dmPanningHeight", wintypes.DWORD),
+    ]
+
+
+class _DisplayDevice(ctypes.Structure):
+    _fields_ = [("cb", wintypes.DWORD), ("DeviceName", wintypes.WCHAR * 32),
+                ("DeviceString", wintypes.WCHAR * 128), ("StateFlags", wintypes.DWORD),
+                ("DeviceID", wintypes.WCHAR * 128), ("DeviceKey", wintypes.WCHAR * 128)]
+
+
+def max_refresh_rate(default=60):
+    """Highest current refresh rate (Hz) among the attached displays."""
+    best, i = 0, 0
+    while True:
+        dev = _DisplayDevice()
+        dev.cb = ctypes.sizeof(dev)
+        if not user32.EnumDisplayDevicesW(None, i, ctypes.byref(dev), 0):
+            break
+        i += 1
+        if not dev.StateFlags & 0x1:  # DISPLAY_DEVICE_ATTACHED_TO_DESKTOP
+            continue
+        dm = _DevMode()
+        dm.dmSize = ctypes.sizeof(dm)
+        if user32.EnumDisplaySettingsW(dev.DeviceName, -1, ctypes.byref(dm)):  # current
+            best = max(best, dm.dmDisplayFrequency)
+    return best if 24 <= best <= 500 else default
