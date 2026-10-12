@@ -388,7 +388,7 @@ def main():
     if mode == "p":
         return  # preview pane: intentionally blank
     if mode == "c":
-        message_box("Matrix Screensaver\n\nNo tiene opciones configurables.",
+        message_box("Matrix Screensaver\n\nThis screensaver has no configurable options.",
                     "Matrix Screensaver")
         return
     seconds = shot = None

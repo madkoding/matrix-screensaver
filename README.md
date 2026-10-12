@@ -1,72 +1,74 @@
 # Matrix Screensaver
 
-Lluvia de código de *The Matrix* como protector de pantalla para Windows, escrito en Python y con soporte multimonitor.
+The digital rain from *The Matrix* as a Windows screensaver, written in Python with multi-monitor support.
 
-![Tres monitores](docs/screenshot.png)
+![Three monitors](docs/screenshot.png)
 
-*Captura real en un setup de 3 monitores (un ultrawide central y dos verticales).*
+*Real capture from a 3-monitor setup (a central ultrawide plus two portrait displays).*
 
-![Detalle](docs/detail.png)
+![Detail](docs/detail.png)
 
-## Características
+## Features
 
-- **Multimonitor:** cada pantalla tiene su propia lluvia, ajustada a su resolución y posición (también con monitores de tamaños y orientaciones distintos).
-- **Glifos de la película:** katakana de ancho medio espejado (MS Gothic) más dígitos y símbolos en Courier New Bold.
-- **Cabeza brillante y estela:** el glifo líder es casi blanco, la estela se apaga en verde fosforescente y los glifos mutan al azar.
-- **Profundidad:** tres capas con paralaje (lejana tenue y lenta, media, y cercana grande y desenfocada).
-- **Bloom** sutil alrededor de las columnas brillantes.
-- **Efecto CRT:** scanlines con interlazado animado (alternan los campos par/impar en cada fotograma).
-- Sale con cualquier tecla, clic o movimiento del ratón.
+- **Multi-monitor:** every display runs its own rain, fitted to its resolution and position (mixed sizes and orientations work).
+- **Film glyphs:** mirrored half-width katakana (MS Gothic) plus digits and symbols in Courier New Bold.
+- **Bright head and trail:** the leading glyph is almost white, the trail fades through phosphor green, and glyphs randomly mutate.
+- **Depth:** three parallax layers (a dim, slow far layer, a middle layer, and a large out-of-focus near layer).
+- **Subtle bloom** around bright columns.
+- **CRT look:** scanlines with animated interlacing (even/odd fields alternate every frame).
+- Exits on any key press, click, or mouse movement.
 
-## Instalación
+## Download
 
-### Opción 1: compilar el `.scr`
+Grab `MatrixRain.scr` from the [latest release](../../releases/latest), then right-click it and choose **Install**. Windows opens the screensaver picker with it already selected.
 
-Requiere Windows y Python 3.10+.
+## Build from source
+
+Requires Windows and Python 3.10+.
 
 ```powershell
 python -m pip install pygame-ce numpy pyinstaller
 .\build.ps1
 ```
 
-Esto genera `MatrixRain.scr`. Haz clic derecho sobre él → **Instalar** y Windows abrirá el selector de protectores de pantalla con este ya elegido.
+This produces `MatrixRain.scr`.
 
-### Opción 2: ejecutar desde Python
+### Run directly from Python
 
 ```powershell
 python -m pip install pygame-ce numpy
 python matrix_saver.py /s
 ```
 
-Para una prueba automática de N segundos con captura al terminar:
+For an automatic N-second test run that saves a screenshot at the end:
 
 ```powershell
-python matrix_saver.py /s --seconds 8 --shot captura.png
+python matrix_saver.py /s --seconds 8 --shot capture.png
 ```
 
-## Configuración
+## Configuration
 
-Los parámetros están al inicio de [`matrix_saver.py`](matrix_saver.py):
+All settings live at the top of [`matrix_saver.py`](matrix_saver.py):
 
-| Constante | Qué hace |
+| Constant | What it does |
 |---|---|
-| `BLOOM_GAIN` | Intensidad del bloom (0 lo desactiva). |
-| `SCANLINE_STRENGTH` | Oscuridad de las scanlines (0 las desactiva). |
-| `INTERLACE_FRAMES` | Fotogramas que dura cada campo del interlazado. |
-| `LAYERS` | Tamaño, brillo, velocidad, densidad, estela y desenfoque de cada capa de profundidad. |
-| `trail_brightness()` | Curva con la que se apaga la estela detrás de cada cabeza. |
-| `BASE_COLOR` / `HEAD_COLOR` | Colores de la estela y de la cabeza. |
+| `BLOOM_GAIN` | Bloom strength (0 disables it). |
+| `SCANLINE_STRENGTH` | How dark the scanlines are (0 disables them). |
+| `INTERLACE_FRAMES` | Frames each interlace field stays on. |
+| `LAYERS` | Size, brightness, speed, density, trail length and blur of each depth layer. |
+| `trail_brightness()` | Curve controlling how a trail fades behind each head. |
+| `BASE_COLOR` / `HEAD_COLOR` | Trail and head colors. |
 
-## Cómo funciona
+## How it works
 
-- Un `.scr` es un `.exe` renombrado; Windows lo lanza con `/s` (ejecutar), `/c` (configurar) o `/p` (vista previa, aquí en blanco). [PyInstaller](https://pyinstaller.org) empaqueta el script.
-- Una sola ventana sin bordes cubre el escritorio virtual completo y cada monitor se dibuja con su propia cuadrícula. Se activa DPI-awareness por monitor para que las coordenadas sean píxeles reales.
-- Cada glifo se pre-renderiza una vez en 20 niveles de brillo, y los fotogramas solo copian superficies con `BLEND_ADD`, de modo que los halos de celdas vecinas se suman.
-- El bloom se calcula desde la cuadrícula de brillo (un píxel por celda), se difumina con numpy y se compone a 1/4 de resolución antes de sumarse a la pantalla.
-- El rendimiento ronda los 45 FPS en tres monitores (7,8 millones de píxeles).
+- A `.scr` is just a renamed `.exe`; Windows launches it with `/s` (run), `/c` (configure) or `/p` (preview, left blank here). [PyInstaller](https://pyinstaller.org) packages the script.
+- A single borderless window covers the whole virtual desktop and each monitor is drawn on its own grid. Per-monitor DPI awareness is enabled so coordinates are real pixels.
+- Each glyph is pre-rendered once at 20 brightness levels, and frames only copy surfaces with `BLEND_ADD`, so halos of neighboring cells add up.
+- Bloom is computed from the brightness grid (one pixel per cell), blurred with numpy, and composed at 1/4 resolution before being added to the screen.
+- Performance is around 45 FPS across three monitors (7.8 million pixels).
 
-## Requisitos
+## Requirements
 
 - Windows 10/11
-- Fuentes `msgothic.ttc` y `courbd.ttf` (vienen con Windows)
+- Fonts `msgothic.ttc` and `courbd.ttf` (shipped with Windows)
 - Python 3.10+, `pygame-ce`, `numpy`
