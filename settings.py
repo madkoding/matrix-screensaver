@@ -40,6 +40,9 @@ PHRASES = [
     "Knock, knock, Neo.",
 ]
 
+# AMD FSR 1.0 upscaling: name -> how many times fewer pixels per axis are rendered
+UPSCALE_RATIO = {"off": 1.0, "quality": 1.5, "balanced": 1.7, "performance": 2.0}
+
 # ----------------------------------------------------------------- settings
 DEFAULTS = {
     "color": "film",
@@ -56,11 +59,13 @@ DEFAULTS = {
     "easter_egg": True,     # occasional typed "Wake up, Neo..." messages
     "renderer": "auto",     # auto | gpu | software
     "font_path": "",        # optional TTF/OTF replacing the glyph font
+    "upscaling": "off",     # off | quality (1.5x) | balanced (1.7x) | performance (2x), AMD FSR 1.0
+    "sharpness": 0.2,       # 0..2 FSR sharpening in stops (0 = sharpest, AMD default 0.2)
 }
 RANGES = {
     "bloom": (0.0, 1.0), "scanlines": (0.0, 0.9), "vignette": (0.0, 1.0),
     "flicker": (0.0, 0.2), "speed": (0.4, 2.5), "density": (0.3, 1.6),
-    "glyph_scale": (0.6, 2.0), "trail_falloff": (0.6, 4.0),
+    "glyph_scale": (0.6, 2.0), "trail_falloff": (0.6, 4.0), "sharpness": (0.0, 2.0),
 }
 
 
@@ -95,6 +100,9 @@ def load():
                 cfg[key] = val
         elif key == "renderer":
             if val in ("auto", "gpu", "software"):
+                cfg[key] = val
+        elif key == "upscaling":
+            if val in UPSCALE_RATIO:
                 cfg[key] = val
         elif isinstance(val, str):
             cfg[key] = val

@@ -12,8 +12,9 @@ import pygame
 
 import glyphs
 from easter_egg import EasterEgg
+from fsr import FSR
 from settings import (CELL_H, CELL_W, COLORS, FONT_SIZE, SPEED_ROWS_PER_SEC,
-                      TRAIL_LEN_ROWS, active_layers)
+                      TRAIL_LEN_ROWS, UPSCALE_RATIO, active_layers)
 
 MAX_MON = 8
 MAX_LAYERS = 4
@@ -196,6 +197,30 @@ void main() {
 }
 """ % dict(MAX_MON=MAX_MON)
 
+# With FSR the frame is composed at render resolution, upscaled, and only then
+# gets the scanlines and flicker, so they stay one real pixel row thick.
+SCAN_FS = """
+#version 330
+uniform sampler2D u_tex;
+uniform float u_gain;
+uniform float u_scan;
+uniform float u_field;
+uniform float u_dither;
+out vec4 o_col;
+float hash12(vec2 p) {
+    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+void main() {
+    vec3 c = texelFetch(u_tex, ivec2(gl_FragCoord.xy), 0).rgb * u_gain;
+    if (u_scan > 0.0 && mod(floor(gl_FragCoord.y) + u_field, 2.0) < 1.0)
+        c *= 1.0 - u_scan;
+    c += (hash12(gl_FragCoord.xy) - 0.5) / 255.0 * u_dither;
+    o_col = vec4(c, 1.0);
+}
+"""
+
 OVERLAY_VS = """
 #version 330
 uniform vec4 u_rect;   // x, y, w, h in px, top-left origin
@@ -259,26 +284,38 @@ class GLRenderer:
         self.head = tuple(c / 255 for c in head)
         self.layers = active_layers(cfg)[:MAX_LAYERS]
 
+        # AMD FSR: render at 1/ratio of the resolution per axis, then upscale.
+        # Skipped in the tiny preview window where it would only blur.
+        ratio = UPSCALE_RATIO[cfg["upscaling"]] if vw >= 1000 else 1.0
+        self.k = 1.0 / ratio
+        self.rsize = (max(2, int(round(vw / ratio))), max(2, int(round(vh / ratio))))
+
         self.atlas, self.atlas_info = self._build_atlas()
         c = self.ctx
+        self.fsr = FSR(c) if ratio > 1.0 else None
         self.p_scene = c.program(vertex_shader=FULLSCREEN_VS, fragment_shader=SCENE_FS)
         self.p_down = c.program(vertex_shader=FULLSCREEN_VS, fragment_shader=DOWN_FS)
         self.p_blur = c.program(vertex_shader=FULLSCREEN_VS, fragment_shader=BLUR_FS)
         self.p_final = c.program(vertex_shader=FULLSCREEN_VS, fragment_shader=FINAL_FS)
         self.p_over = c.program(vertex_shader=OVERLAY_VS, fragment_shader=OVERLAY_FS)
+        self.p_scan = c.program(vertex_shader=FULLSCREEN_VS, fragment_shader=SCAN_FS)
         self.vao = {k: c.vertex_array(p, []) for k, p in
                     dict(scene=self.p_scene, down=self.p_down, blur=self.p_blur,
-                         final=self.p_final, over=self.p_over).items()}
+                         final=self.p_final, over=self.p_over, scan=self.p_scan).items()}
 
-        def target(w, h):
-            tex = c.texture((max(1, w), max(1, h)), 4)
+        def target(w, h, dtype="f1"):
+            tex = c.texture((max(1, w), max(1, h)), 4, dtype=dtype)
             tex.filter = (moderngl.LINEAR, moderngl.LINEAR)
             tex.repeat_x = tex.repeat_y = False
             return tex, c.framebuffer(color_attachments=[tex])
 
-        self.scene_tex, self.scene_fbo = target(vw, vh)
-        self.q = [target(vw // 4, vh // 4), target(vw // 4, vh // 4),
-                  target(vw // 16, vh // 16), target(vw // 16, vh // 16)]
+        rw, rh = self.rsize
+        self.scene_tex, self.scene_fbo = target(rw, rh)
+        self.q = [target(rw // 4, rh // 4), target(rw // 4, rh // 4),
+                  target(rw // 16, rh // 16), target(rw // 16, rh // 16)]
+        if self.fsr:
+            self.post_tex, self.post_fbo = target(rw, rh)            # composed frame, render res
+            self.up_tex, self.up_fbo = target(vw, vh, "f2")          # FSR output, display res
         self._init_static_uniforms()
 
         self.egg = EasterEgg(cfg["easter_egg"])
@@ -313,14 +350,15 @@ class GLRenderer:
         return tex, info
 
     def _init_static_uniforms(self):
-        vw, vh = self.size
+        vw, vh = self.rsize                    # everything below lives in render-resolution pixels
+        k = self.k
         mons = np.zeros((MAX_MON, 4), "f4")
         dpi = np.ones(MAX_MON, "f4")
         ox = min(m["x"] for m in self.mons)
         oy = min(m["y"] for m in self.mons)
         for i, m in enumerate(self.mons):
-            mons[i] = (m["x"] - ox, m["y"] - oy, m["w"], m["h"])
-            dpi[i] = m["dpi"]
+            mons[i] = ((m["x"] - ox) * k, (m["y"] - oy) * k, m["w"] * k, m["h"] * k)
+            dpi[i] = m["dpi"] * k              # glyphs keep their on-screen size after upscaling
         lay0 = np.zeros((MAX_LAYERS, 4), "f4")
         lay1 = np.zeros((MAX_LAYERS, 4), "f4")
         for i, lay in enumerate(self.layers):
@@ -353,8 +391,8 @@ class GLRenderer:
         bloom = float(self.cfg["bloom"])
         _set(f, "u_g1", bloom * 0.55)
         _set(f, "u_g2", bloom * 0.9)
-        _set(f, "u_scan", float(self.cfg["scanlines"]))
-        _set(self.p_over, "u_res", (float(vw), float(vh)))
+        _set(f, "u_scan", 0.0 if self.fsr else float(self.cfg["scanlines"]))
+        _set(self.p_over, "u_res", (float(vw), float(vh)))   # render resolution
         self.bloom_on = bloom > 0
 
     # ----------------------------------------------------------- frame
@@ -380,11 +418,11 @@ class GLRenderer:
 
     def render(self, t, dt, frame):
         ctx = self.ctx
-        vw, vh = self.size
+        rw, rh = self.rsize
         ctx.disable(moderngl.BLEND)
 
         self.scene_fbo.use()
-        ctx.viewport = (0, 0, vw, vh)
+        ctx.viewport = (0, 0, rw, rh)
         self.atlas.use(0)
         _set(self.p_scene, "u_time", float(t))
         self._fullscreen("scene")
@@ -395,17 +433,36 @@ class GLRenderer:
             self._blur_chain(self.scene_tex, self.q[0], self.q[1])
             self._blur_chain(self.q[0][0], self.q[2], self.q[3])
 
-        ctx.screen.use()
-        ctx.viewport = (0, 0, vw, vh)
+        if self.fsr:
+            self.post_fbo.use()
+        else:
+            ctx.screen.use()
+        ctx.viewport = (0, 0, rw, rh)
         ctx.disable(moderngl.BLEND)
         self.scene_tex.use(0)
         self.q[0][0].use(1)
         self.q[2][0].use(2)
         flick = self.cfg["flicker"]
         gain = 1.0 + flick * (float(self.rng.random()) - 0.5) * 2.0
-        _set(self.p_final, "u_gain", gain)
-        _set(self.p_final, "u_field", float(frame % 2) if self.cfg["interlace"] else 0.0)
+        field = float(frame % 2) if self.cfg["interlace"] else 0.0
+        _set(self.p_final, "u_gain", 1.0 if self.fsr else gain)
+        _set(self.p_final, "u_field", field)
         self._fullscreen("final")
+
+        if self.fsr:
+            vw, vh = self.size
+            self.fsr.upscale(self.post_tex, (rw, rh), self.up_fbo, (vw, vh),
+                             sharpness=float(self.cfg["sharpness"]))
+            ctx.screen.use()
+            ctx.viewport = (0, 0, vw, vh)
+            self.up_tex.use(0)
+            s = self.p_scan
+            _set(s, "u_tex", 0)
+            _set(s, "u_gain", gain)
+            _set(s, "u_scan", float(self.cfg["scanlines"]))
+            _set(s, "u_field", field)
+            _set(s, "u_dither", 1.0)
+            self._fullscreen("scan")
 
     # ------------------------------------------------------ easter egg
     def _text_texture(self, text, height):
@@ -428,10 +485,11 @@ class GLRenderer:
         mon = self.mons[0]
         ox = min(m["x"] for m in self.mons)
         oy = min(m["y"] for m in self.mons)
-        height = int(mon["h"] * 0.05 * mon["dpi"] ** 0.5)
+        k = self.k
+        height = max(8, int(mon["h"] * 0.05 * mon["dpi"] ** 0.5 * k))
         tex, (tw, th) = self._text_texture(text, height)
-        x = mon["x"] - ox + mon["w"] * 0.10
-        y = mon["y"] - oy + mon["h"] * 0.42
+        x = (mon["x"] - ox + mon["w"] * 0.10) * k
+        y = (mon["y"] - oy + mon["h"] * 0.42) * k
         ctx, p = self.ctx, self.p_over
         ctx.enable(moderngl.BLEND)
 

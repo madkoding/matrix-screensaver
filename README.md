@@ -12,7 +12,7 @@ The digital rain from *The Matrix* as a Windows screensaver, written in Python. 
 
 ## Features
 
-- **GPU rendering (OpenGL):** the whole rain is computed in a fragment shader, so it locks to your displays' refresh rate. It renders 200+ FPS uncapped on an RTX 3060 across three monitors (7.8 million pixels), so there is plenty of headroom. A software renderer takes over automatically when OpenGL isn't available (Remote Desktop, some VMs).
+- **GPU rendering (OpenGL):** the whole rain is computed in a fragment shader, so it locks to your displays' refresh rate. It renders about 700 FPS uncapped on an RTX 3060 across three monitors (7.8 million pixels), so there is enormous headroom. A software renderer takes over automatically when OpenGL isn't available (Remote Desktop, some VMs).
 - **Multi-monitor and DPI-aware:** every display runs its own rain, fitted to its resolution, position and Windows scaling. Plugging or unplugging a display while it runs is picked up automatically.
 - **Film glyphs:** mirrored half-width katakana (MS Gothic) plus digits and symbols in Courier New Bold.
 - **Bright head and trail:** the leading glyph is almost white, the trail fades through phosphor green, and glyphs randomly mutate.
@@ -22,6 +22,7 @@ The digital rain from *The Matrix* as a Windows screensaver, written in Python. 
 - **Typed messages:** now and then *"Wake up, Neo..."* and friends type themselves out over the rain.
 - **Colors:** `film`, `classic`, `amber`, `red`, `blue`, `white`.
 - **Settings dialog** and a live **preview** in the Windows screensaver picker.
+- **Optional AMD FSR 1.0 upscaling:** render at 67%, 59% or 50% of the resolution per axis and upscale with a GLSL port of AMD's EASU + RCAS (off by default). The rain is such a cheap shader that on a fast GPU FSR costs more than it saves (about 700 FPS native against 470-530 with FSR on an RTX 3060), so it is meant for weak or integrated GPUs and very high resolutions. Scanlines, interlacing and flicker are applied after upscaling so they stay one real pixel row thick.
 - **Paced to your monitors:** frames are capped at the fastest display's refresh rate (60, 75, 144 Hz...) with a precise limiter, so it doesn't burn GPU for nothing. On battery it drops to 30 FPS.
 - Exits on any key press, click, or mouse movement.
 
@@ -49,6 +50,8 @@ Open **Settings...** in the screensaver picker. Values are stored in `%APPDATA%\
 | `depth` | Three parallax layers instead of one. |
 | `easter_egg` | Occasional typed messages. |
 | `renderer` | `auto`, `gpu` or `software`. |
+| `upscaling` | AMD FSR 1.0: `off` (default), `quality` (1.5x), `balanced` (1.7x) or `performance` (2x). GPU renderer only. |
+| `sharpness` | FSR sharpening in stops: 0 is sharpest, 2 softest (AMD's default is 0.2). |
 | `font_path` | Optional TTF/OTF to use for every glyph. |
 
 ### Using the film's font
@@ -89,7 +92,8 @@ Example: `python matrix_saver.py /s --seconds 8 --shot capture.png`
 | File | Role |
 |---|---|
 | `matrix_saver.py` | Entry point: argument parsing (`/s`, `/c`, `/p`), main loop, hot-plug and battery handling. |
-| `gl_renderer.py` | GPU path: procedural rain shader, glyph atlas, bloom chain, final composite. |
+| `gl_renderer.py` | GPU path: procedural rain shader, glyph atlas, bloom chain, final composite, optional FSR and the post-upscale scanline pass. |
+| `fsr.py` | Standalone, reusable AMD FSR 1.0 (EASU + RCAS) for moderngl, shared with the aquarium screensaver. |
 | `soft_renderer.py` | CPU fallback with the same look. |
 | `settings.py` | Defaults, JSON persistence and the shared look constants. |
 | `config_dialog.py` | Tk settings window. |
@@ -108,3 +112,7 @@ Example: `python matrix_saver.py /s --seconds 8 --shot capture.png`
 - Windows 10/11
 - Fonts `msgothic.ttc` and `courbd.ttf` (shipped with Windows)
 - Python 3.10+, `pygame-ce`, `numpy`, `moderngl` (only to run from source)
+
+## Credits
+
+- Upscaling is based on AMD FidelityFX Super Resolution 1.0 (MIT license); see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

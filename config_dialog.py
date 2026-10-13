@@ -13,6 +13,7 @@ SLIDERS = [  # (key, label, from, to, decimals)
     ("density", "Rain density", 0.3, 1.6, 2),
     ("glyph_scale", "Glyph size", 0.6, 2.0, 2),
     ("trail_falloff", "Trail fade (higher = shorter)", 0.6, 4.0, 2),
+    ("sharpness", "FSR sharpening (0 = sharpest)", 0.0, 2.0, 2),
 ]
 CHECKS = [
     ("interlace", "Animated interlacing (alternate scanline fields)"),
@@ -62,6 +63,12 @@ def show():
     ttk.Label(frm, text="Renderer").grid(row=row, column=0, sticky="w", pady=3)
     vars_["renderer"] = tk.StringVar(value=cfg["renderer"])
     ttk.Combobox(frm, textvariable=vars_["renderer"], values=["auto", "gpu", "software"],
+                 state="readonly", width=14).grid(row=row, column=1, sticky="w", padx=8)
+    row += 1
+
+    ttk.Label(frm, text="Upscaling (AMD FSR 1.0)").grid(row=row, column=0, sticky="w", pady=3)
+    vars_["upscaling"] = tk.StringVar(value=cfg["upscaling"])
+    ttk.Combobox(frm, textvariable=vars_["upscaling"], values=list(settings.UPSCALE_RATIO),
                  state="readonly", width=14).grid(row=row, column=1, sticky="w", padx=8)
     row += 1
 
