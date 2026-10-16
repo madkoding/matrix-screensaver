@@ -64,11 +64,6 @@ h2 + p.sub { color: var(--muted); margin: 0 0 26px; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
 .card h3 { margin: 0 0 6px; font-size: 1.05rem; color: var(--accent); }
 .card p { margin: 0; color: var(--muted); font-size: 15px; }
-.gallery { display: grid; gap: 18px; grid-template-columns: repeat(2, 1fr); }
-@media (max-width: 700px) { .gallery { grid-template-columns: 1fr; } }
-.gallery figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-.gallery img { display: block; width: 100%; height: auto; }
-.gallery figcaption { padding: 12px 16px; color: var(--muted); font-size: 14px; }
 ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; gap: 14px; }
 ol.steps li { counter-increment: s; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
   padding: 16px 20px 16px 62px; position: relative; }
@@ -125,7 +120,7 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
   <header class="top">
     <a class="brand" href="#">Matrix<span>Screensaver</span></a>
     <nav>
-      <a class="hide-sm" href="#features">Features</a><a class="hide-sm" href="#gallery">Gallery</a><a class="hide-sm" href="#install">Install</a><a class="hide-sm" href="https://github.com/madkoding/matrix-screensaver">GitHub</a>
+      <a class="hide-sm" href="#features">Features</a><a class="hide-sm" href="#install">Install</a><a class="hide-sm" href="https://github.com/madkoding/matrix-screensaver">GitHub</a>
       <a class="lang" href="es/" data-set-lang="es" hreflang="es" lang="es" title="Ver esta página en español">Español</a>
     </nav>
   </header>
@@ -160,15 +155,6 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: s
         <div class="card"><h3>CRT feel</h3><p>Scanlines with animated interlacing, a vignette and a subtle flicker.</p></div>
         <div class="card"><h3>Wake up, Neo…</h3><p>Now and then a message types itself out over the rain.</p></div>
         <div class="card"><h3>Fast and tunable</h3><p>Runs on the GPU (about 700 FPS uncapped on an RTX 3060) with an automatic software fallback, plus six colours and a settings window.</p></div>
-      </div>
-    </section>
-
-    <section id="gallery">
-      <h2>Gallery</h2>
-      <p class="sub">Real captures from a three-monitor setup.</p>
-      <div class="gallery">
-        <figure><img src="detail.png" alt="Close-up of the glyphs with glow and scanlines" loading="lazy"><figcaption>Close up: glow, depth and scanlines.</figcaption></figure>
-        <figure><img src="message.png" alt="A typed &#x27;Wake up, Neo...&#x27; message over the rain" loading="lazy"><figcaption>Now and then: &quot;Wake up, Neo...&quot;</figcaption></figure>
       </div>
     </section>
 
