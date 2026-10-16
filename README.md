@@ -2,6 +2,8 @@
 
 The digital rain from *The Matrix* as a Windows screensaver, written in Python. GPU-rendered, multi-monitor, DPI-aware, and configurable.
 
+**Website and install guide:** https://madkoding.github.io/matrix-screensaver/
+
 ![Three monitors](docs/screenshot.png)
 
 *Real capture from a 3-monitor setup (a central ultrawide plus two portrait displays).*
