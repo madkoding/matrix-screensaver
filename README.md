@@ -6,6 +6,10 @@ The digital rain from *The Matrix* as a Windows screensaver, written in Python. 
 
 **Website and install guide:** https://madkoding.github.io/matrix-screensaver/ (also in [Spanish](https://madkoding.github.io/matrix-screensaver/es/))
 
+![Matrix Screensaver demo (looping clip)](docs/demo.gif)
+
+*Looping demo clip of the screensaver running.*
+
 ![Three monitors](docs/screenshot.png)
 
 *Real capture from a 3-monitor setup (a central ultrawide plus two portrait displays).*

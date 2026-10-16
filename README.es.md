@@ -6,6 +6,10 @@ La lluvia digital de *The Matrix* como protector de pantalla para Windows, escri
 
 **Web y guía de instalación:** https://madkoding.github.io/matrix-screensaver/es/
 
+![Demo de Matrix Screensaver (clip en bucle)](docs/demo.gif)
+
+*Clip de demostración en bucle del protector en funcionamiento.*
+
 ![Tres monitores](docs/screenshot.png)
 
 *Captura real de una configuración de 3 monitores (un ultrapanorámico central y dos pantallas verticales).*
