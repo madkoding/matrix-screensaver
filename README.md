@@ -1,8 +1,10 @@
 # Matrix Screensaver
 
+**English** · [Español](README.es.md)
+
 The digital rain from *The Matrix* as a Windows screensaver, written in Python. GPU-rendered, multi-monitor, DPI-aware, and configurable.
 
-**Website and install guide:** https://madkoding.github.io/matrix-screensaver/
+**Website and install guide:** https://madkoding.github.io/matrix-screensaver/ (also in [Spanish](https://madkoding.github.io/matrix-screensaver/es/))
 
 ![Three monitors](docs/screenshot.png)
 
@@ -114,6 +116,10 @@ Example: `python matrix_saver.py /s --seconds 8 --shot capture.png`
 - Windows 10/11
 - Fonts `msgothic.ttc` and `courbd.ttf` (shipped with Windows)
 - Python 3.10+, `pygame-ce`, `numpy`, `moderngl` (only to run from source)
+
+## License
+
+Copyright (C) 2026 madkoding. This project is free software, released under the [GNU General Public License v3.0](LICENSE): you can use, study, share and modify it, and redistribute modified versions under the same license. Third-party components keep their own licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Credits
 

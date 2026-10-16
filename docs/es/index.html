@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matrix Screensaver — la lluvia digital para Windows</title>
+<meta name="description" content="La lluvia digital de Matrix como protector de pantalla multimonitor para Windows: katakana en espejo, estelas brillantes, profundidad, bloom y scanlines de CRT. Gratis.">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://madkoding.github.io/matrix-screensaver/es/">
+<link rel="alternate" hreflang="en" href="https://madkoding.github.io/matrix-screensaver/">
+<link rel="alternate" hreflang="es" href="https://madkoding.github.io/matrix-screensaver/es/">
+<link rel="alternate" hreflang="x-default" href="https://madkoding.github.io/matrix-screensaver/">
+<meta property="og:title" content="Matrix Screensaver — la lluvia digital para Windows">
+<meta property="og:description" content="La lluvia digital de Matrix como protector de pantalla multimonitor para Windows: katakana en espejo, estelas brillantes, profundidad, bloom y scanlines de CRT. Gratis.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:image" content="https://madkoding.github.io/matrix-screensaver/screenshot.png">
+<meta property="og:url" content="https://madkoding.github.io/matrix-screensaver/es/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+:root {
+  --bg: #010503; --panel: #04120a; --line: #0e3a1e; --text: #e8f1ee; --muted: #9bb0aa;
+  --accent: #00ff46; --accent-2: #7dffa0; --on-accent: #002208;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:hover { color: var(--accent-2); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+header.top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 12px; }
+.brand { font-weight: 700; letter-spacing: .02em; color: var(--text); text-decoration: none; }
+.brand span { color: var(--accent); }
+nav { display: flex; align-items: center; }
+nav a { margin-left: 18px; color: var(--muted); text-decoration: none; font-size: 15px; }
+nav a:hover { color: var(--text); }
+nav a.lang { border: 1px solid var(--line); border-radius: 8px; padding: 3px 11px; color: var(--text); background: var(--panel); }
+nav a.lang:hover { border-color: var(--accent); }
+.hero { text-align: center; padding: 36px 0 12px; }
+.hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin: 0 0 14px; letter-spacing: -.02em; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p.lead { max-width: 680px; margin: 0 auto 26px; color: var(--muted); font-size: 1.1rem; }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.btn {
+  display: inline-block; padding: 13px 24px; border-radius: 10px; font-weight: 650; text-decoration: none;
+  border: 1px solid var(--line); color: var(--text); background: var(--panel);
+}
+.btn:hover { border-color: var(--accent); color: var(--text); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); box-shadow: 0 8px 30px rgba(0,255,70,.35); }
+.btn.primary:hover { background: var(--accent-2); border-color: var(--accent-2); color: var(--on-accent); }
+.meta { color: var(--muted); font-size: 14px; margin-top: 12px; }
+.shot { margin: 34px auto 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  box-shadow: 0 20px 70px rgba(0,0,0,.55); }
+.shot img { display: block; width: 100%; height: auto; }
+.caption { color: var(--muted); font-size: 14px; text-align: center; margin: 10px 0 0; }
+section { padding: 56px 0 8px; }
+h2 { font-size: 1.7rem; margin: 0 0 8px; letter-spacing: -.01em; }
+h2 + p.sub { color: var(--muted); margin: 0 0 26px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+.card h3 { margin: 0 0 6px; font-size: 1.05rem; color: var(--accent); }
+.card p { margin: 0; color: var(--muted); font-size: 15px; }
+.gallery { display: grid; gap: 18px; grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 700px) { .gallery { grid-template-columns: 1fr; } }
+.gallery figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.gallery img { display: block; width: 100%; height: auto; }
+.gallery figcaption { padding: 12px 16px; color: var(--muted); font-size: 14px; }
+ol.steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; gap: 14px; }
+ol.steps li { counter-increment: s; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px 20px 16px 62px; position: relative; }
+ol.steps li::before {
+  content: counter(s); position: absolute; left: 18px; top: 14px; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: var(--on-accent); font-weight: 800; display: grid; place-items: center;
+}
+ol.steps strong { color: var(--text); }
+ol.steps p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+kbd, code { background: rgba(255,255,255,.07); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px;
+  font: 0.92em ui-monospace, Consolas, monospace; color: var(--text); }
+pre { background: #02050a; border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
+pre code { border: 0; background: none; padding: 0; }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin-top: 14px; }
+details summary { cursor: pointer; font-weight: 600; }
+details p, details ul { color: var(--muted); font-size: 15px; }
+.note { border-left: 3px solid var(--accent); padding: 10px 16px; background: rgba(255,255,255,.03); border-radius: 0 10px 10px 0;
+  color: var(--muted); font-size: 15px; margin-top: 16px; }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; width: 34%; }
+footer { margin-top: 70px; padding: 28px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; }
+@media (max-width: 560px) { nav a.hide-sm { display: none; } .hero { padding-top: 14px; } }
+</style>
+<script>
+/* Language: English at "/", Spanish at "/es/". The English page sends Spanish-speaking
+   browsers to /es/; a stored choice (the language button) always wins. */
+(function () {
+  function pickLang(pref, navLang) {
+    if (pref === 'en' || pref === 'es') return pref;
+    return /^es(\b|-|_)/i.test(navLang || '') ? 'es' : 'en';
+  }
+  window.pickLang = pickLang;
+  var here = 'es', pref = null;
+  try {
+    var q = new URLSearchParams(location.search).get('lang');
+    if (q === 'en' || q === 'es') localStorage.setItem('lang', q);
+    pref = localStorage.getItem('lang');
+  } catch (e) {}
+  var nav = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+  var want = pickLang(pref, nav);
+  if (here === 'en' && want === 'es') location.replace('' + location.hash);
+  if (here === 'es' && pref === 'en') location.replace('../' + location.hash);
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[data-set-lang]');
+    if (a) try { localStorage.setItem('lang', a.getAttribute('data-set-lang')); } catch (x) {}
+  });
+})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#">Matrix<span>Screensaver</span></a>
+    <nav>
+      <a class="hide-sm" href="#features">Características</a><a class="hide-sm" href="#gallery">Galería</a><a class="hide-sm" href="#install">Instalar</a><a class="hide-sm" href="https://github.com/madkoding/matrix-screensaver">GitHub</a>
+      <a class="lang" href="../" data-set-lang="en" hreflang="en" lang="en" title="View this page in English">English</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>La <em>lluvia digital</em><br>de The Matrix</h1>
+      <p class="lead">Katakana en espejo cae en columnas verdes brillantes por cada monitor que tengas, con una cabeza blanca brillante, una estela que se desvanece, tres capas de profundidad y el aspecto de un viejo CRT.</p>
+      <div class="btns">
+        <a class="btn primary" href="https://github.com/madkoding/matrix-screensaver/releases/latest/download/MatrixRain.scr">Descargar MatrixRain.scr</a>
+        <a class="btn" href="#install">Cómo instalar</a>
+        <a class="btn" href="https://github.com/madkoding/matrix-screensaver">Ver en GitHub</a>
+      </div>
+      <p class="meta">Gratis · Windows 10/11 · unos 30 MB · <a href="https://github.com/madkoding/matrix-screensaver/releases">todas las versiones</a></p>
+      <div class="shot"><img src="../screenshot.png" alt="Lluvia digital de Matrix en tres monitores" width="2000" height="676"></div>
+      <p class="caption">Tres monitores, cada uno con su propia lluvia.</p>
+    </div>
+
+    <section id="features">
+      <h2>Qué incluye</h2>
+      <p class="sub">Creado desde cero con Python y OpenGL.</p>
+      <div class="grid">
+        <div class="card"><h3>Multimonitor y sensible al DPI</h3><p>Cada pantalla ejecuta su propia lluvia, ajustada a su tamaño, posición y escala. Conecta o desconecta una pantalla mientras funciona.</p></div>
+        <div class="card"><h3>El aspecto de la película</h3><p>Katakana de medio ancho en espejo más dígitos, una cabeza casi blanca, una estela verde que se desvanece y glifos que mutan.</p></div>
+        <div class="card"><h3>Profundidad y brillo</h3><p>Tres capas con paralaje (una lejana y tenue, una intermedia y una cercana, grande y desenfocada) con bloom real.</p></div>
+        <div class="card"><h3>Sensación de CRT</h3><p>Scanlines con interlazado animado, viñeteado y un parpadeo sutil.</p></div>
+        <div class="card"><h3>Wake up, Neo…</h3><p>De vez en cuando un mensaje se escribe solo sobre la lluvia.</p></div>
+        <div class="card"><h3>Rápido y ajustable</h3><p>Funciona en la GPU (unos 700 FPS sin tope en una RTX 3060) con respaldo automático por software, además de seis colores y una ventana de ajustes.</p></div>
+      </div>
+    </section>
+
+    <section id="gallery">
+      <h2>Galería</h2>
+      <p class="sub">Capturas reales de una configuración de tres monitores.</p>
+      <div class="gallery">
+        <figure><img src="../detail.png" alt="Primer plano de los glifos con brillo y scanlines" loading="lazy"><figcaption>Primer plano: brillo, profundidad y scanlines.</figcaption></figure>
+        <figure><img src="../message.png" alt="Un mensaje «Wake up, Neo...» escribiéndose sobre la lluvia" loading="lazy"><figcaption>De vez en cuando: «Wake up, Neo...»</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="install">
+      <h2>Descarga e instalación</h2>
+      <p class="sub">Toma alrededor de un minuto. Sin instalador ni cuenta.</p>
+      <ol class="steps">
+        <li><strong>Descarga <code>MatrixRain.scr</code></strong>
+          <p>Pulsa el botón de arriba, o búscalo en la página de la <a href="https://github.com/madkoding/matrix-screensaver/releases/latest">última versión</a> (el archivo está en <em>Assets</em>).</p></li>
+        <li><strong>Haz clic derecho sobre el archivo y elige <kbd>Instalar</kbd></strong>
+          <p>Windows abre la ventana <em>Configuración del protector de pantalla</em> con él ya seleccionado. Si Windows pide permisos de administrador, acéptalos: copia el archivo donde viven los protectores de pantalla.</p></li>
+        <li><strong>Pulsa <kbd>Aplicar</kbd> y <kbd>Aceptar</kbd></strong>
+          <p>En <em>Esperar</em> elige cuántos minutos de inactividad quieres. Usa <kbd>Vista previa</kbd> para probarlo al instante; cualquier tecla o movimiento del ratón lo cierra.</p></li>
+        <li><strong>Opcional: pulsa <kbd>Configuración…</kbd> para ajustarlo</strong>
+          <p>Seis colores (verde película, clásico, ámbar, rojo, azul, blanco), brillo, scanlines, velocidad de caída, densidad, tamaño de glifos y más. Incluso puedes usar una fuente propia.</p></li>
+      </ol>
+
+      <div class="note"><strong>¿Windows dice «protegió su PC»?</strong> El archivo no está firmado digitalmente (hace falta un certificado de pago), así que SmartScreen o tu antivirus pueden avisar, como con muchas herramientas pequeñas. Pulsa <kbd>Más información</kbd> → <kbd>Ejecutar de todas formas</kbd>. Si el menú del clic derecho no tiene <em>Instalar</em>, haz clic derecho → <kbd>Propiedades</kbd> → marca <kbd>Desbloquear</kbd> → <kbd>Aceptar</kbd> primero. Puedes leer todo el código en GitHub y compilarlo tú mismo.</div>
+
+      <details>
+        <summary>¿No encuentras la ventana del protector de pantalla?</summary>
+        <p>Pulsa la tecla Windows y escribe <code>protector de pantalla</code>, y abre <em>Cambiar protector de pantalla</em>. En Windows 11 también está en <em>Configuración → Personalización → Pantalla de bloqueo → Protector de pantalla</em>. Elige <em>Matrix Screensaver</em> en la lista desplegable.</p>
+      </details>
+      <details>
+        <summary>Instalar a mano (copiar el archivo)</summary>
+        <p>Copia <code>MatrixRain.scr</code> a <code>C:\Windows\System32</code> (requiere permisos de administrador). Aparecerá en la lista de protectores de pantalla.</p>
+      </details>
+      <details>
+        <summary>Ejecutarlo desde el código</summary>
+        <pre><code>git clone https://github.com/madkoding/matrix-screensaver.git
+cd matrix-screensaver
+python -m pip install -r requirements.txt
+python matrix_saver.py /s</code></pre>
+        <p>Necesitas Python 3.10+ en Windows. Para compilar tu propio <code>MatrixRain.scr</code> ejecuta <code>.\build.ps1</code> (mira el README).</p>
+      </details>
+      <details>
+        <summary>Desinstalar</summary>
+        <p>Abre otra vez la ventana del protector de pantalla y elige otro (o <em>(Ninguno)</em>). Para borrar el archivo, elimina <code>MatrixRain.scr</code> de la carpeta donde lo copiaste (normalmente <code>C:\Windows\System32</code>). Tus ajustes están en <code>%APPDATA%\MatrixRain</code>; borra esa carpeta para restablecerlos.</p>
+      </details>
+    </section>
+
+    <section id="requirements">
+      <h2>Requisitos</h2>
+      <table>
+        <tr><th>Sistema</th><td>Windows 10 u 11</td></tr>
+        <tr><th>Gráficos</th><td>Cualquier GPU con OpenGL 3.3 o superior. Sin ella, un renderizador por software más lento toma el relevo automáticamente.</td></tr>
+        <tr><th>Fuentes</th><td>Usa las fuentes <em>MS Gothic</em> y <em>Courier New</em> que vienen con Windows.</td></tr>
+      </table>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Hecho por <a href="https://github.com/madkoding">madkoding</a> · <a href="https://github.com/madkoding/matrix-screensaver">código fuente</a> · <a href="https://github.com/madkoding/matrix-screensaver/issues">reportar un problema</a> · <a href="https://github.com/madkoding/matrix-screensaver/blob/main/LICENSE">licencia GPL-3.0</a></span>
+    <span>Escalado opcional basado en <a href="https://github.com/GPUOpen-Effects/FidelityFX-FSR">AMD FidelityFX Super Resolution 1.0</a> (MIT).</span>
+  </div>
+</footer>
+</body>
+</html>
